@@ -1,0 +1,15 @@
+.notification1{
+  background-color: yellow;
+  color:  rgb(0, 0, 0);
+  height : 2rem;
+}
+.notification2{
+  background-color: rgb(25, 167, 25);
+  color:  white;
+  height : 2rem;
+}
+.notification3{
+  background-color: red;
+  color:  white;
+  height : 2rem;
+}

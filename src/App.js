@@ -5,25 +5,33 @@
 import { useEffect } from "react";
 import axios from "axios";
 import { uiAction } from "./Store/Ui";
-import Notificationl from "./components/Notification/Notificationl";
-
-  function App() {
+import Notificationl from "./components/Notification/Notification";
+import { getData } from "./Store/Cart";
+let initial = true
+function App() {
     const cartIsVisible = useSelector((state) => state.ui.cartIsVisible);
     const  cart = useSelector(state =>state.cart);
     const dispatch = useDispatch();
     useEffect(()=>{
+     
       setTimeout(() => {
         dispatch(uiAction.setRejected(false));
         dispatch(uiAction.setLoading(false));
         dispatch(uiAction.setFullfilled(false));
       }, 4000);
-      const sendData =async(cart)=>{
+      const sendData =async(cart )=>{
+        
         try{
-          dispatch(uiAction.setLoading(true));
-          const response = await axios.put(`${process.env.REACT_APP_FIREBASE_URL}products.json`,cart);
+          if(initial){
+            initial = false;
+            return;
+          }else{
+            dispatch(uiAction.setLoading(true));
+            const response = await axios.put(`${process.env.REACT_APP_FIREBASE_URL}products.json`,cart);
           dispatch(uiAction.setLoading(false));
           console.log(response);
           dispatch(uiAction.setFullfilled(true));
+        }
         }catch(err){
           dispatch(uiAction.setRejected(true));
           dispatch(uiAction.setLoading(false));
@@ -33,13 +41,18 @@ import Notificationl from "./components/Notification/Notificationl";
       }
       sendData(cart);
       
-    },[cart ,dispatch])
+    },[cart ,dispatch]);
+    useEffect(()=>{
+      dispatch(getData());
+    },[dispatch]);
     return (
-      <Layout>
+      <>
         <Notificationl/>
+      <Layout>
         {cartIsVisible && <Cart />}
         <Products />
       </Layout>
+      </>
     );
   }
 

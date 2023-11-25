@@ -1,4 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+
+
+
+
+export const getData = createAsyncThunk('getData' , async()=>{
+
+    try{
+      const response = await axios.get(`${process.env.REACT_APP_FIREBASE_URL}products.json`);
+      console.log(response.data.items);
+        return response.data.items;
+    }catch(err){
+
+       console.log(err);
+       return "error";
+    }
+})
 
 const cartInitialState = {
   items: [],
@@ -14,12 +32,14 @@ const cartSlice = createSlice({
       const newItem = action.payload;
       const existingItem = state.items.find((item) => item.id === newItem.id);
       state.totalQuantity++;
+      console.log(state.totalQuantity)
       if (existingItem) {
         existingItem.quantity++;
         existingItem.totalPrice += newItem.price;
       } else {
         state.items.push(newItem);
       }
+      
     },
     removeToCart(state ,action){
       const id = action.payload;
@@ -34,6 +54,17 @@ const cartSlice = createSlice({
       }
     }
   },
+  extraReducers : (builder)=>{
+    builder.addCase(getData.fulfilled , (state,action)=>{
+      console.log("payload " , action.payload);
+          state.items = action.payload;
+          console.log(state.items ,"thisi s the items")
+    })
+    builder.addCase(getData.rejected, (state,action)=>{
+      console.log(action.payload);
+
+    })
+  }
 });
 export default cartSlice.reducer;
 export const cartAction = cartSlice.actions;
